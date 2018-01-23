@@ -9,7 +9,7 @@ var session = require('express-session');
 var passport = require('passport');
 var config = require('./config');
 var app = express();
-var lang = null;
+var download = require('download-pdf');
 var formidable = require('formidable');
 
 var users = {};
@@ -145,6 +145,10 @@ app.get('/logout', function(req, res){
       		res.redirect(config.destroySessionUrl);
     	});
 	}
+});
+
+app.get('/download', function(req, res){
+	res.download(__dirname + '/uploads/test.pdf');
 });
 
 // ==========================================================================
