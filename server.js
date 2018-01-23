@@ -10,6 +10,7 @@ var passport = require('passport');
 var config = require('./config');
 var app = express();
 var lang = null;
+var formidable = require('formidable');
 
 var users = {};
 
@@ -114,10 +115,28 @@ app.get('/', function(req, res){
 	}
 });
 
-app.get('/events', function(req, res){
+app.get('/events', ensureAuthenticated, function(req, res){
  console.log(req.user.name);
  res.render('index.ejs');
-})
+});
+
+app.get('/file', function(req, res){
+	res.render('uploadFile.ejs');
+});
+
+app.post('/upload', function(req, res){
+	var form = new formidable.IncomingForm();
+	form.parse(req);
+	form.on('fileBegin', function (name, file){
+        file.path = __dirname + '/uploads/' + file.name;
+    });
+
+    form.on('file', function (name, file){
+        console.log('Uploaded ' + file.name);
+    });
+
+    res.redirect('/events');
+});
 
 app.get('/logout', function(req, res){
 	if(req.user){
