@@ -5,6 +5,19 @@
 </head>
 <body>
 <form action="/upload" enctype="multipart/form-data" method="post">
+    Number of Group Members:
+    <select name = "number">
+      <option value = "1">1</option>
+      <option value = "2">2</option>
+      <option value = "3">3</option>
+      <option value = "4">4</option>
+    </select><br>
+    Group Member 1 : <input type = "text" name = "Student1"><br>
+    Group Member 2 : <input type = "text" name = "Student2"><br>
+    Group Member 3 : <input type = "text" name = "Student3"><br>
+    Group Member 4 : <input type = "text" name = "Student4"><br>
+    Project Title : <input type = "text" name = "Title"><br>
+    Project Code : <input type = "text" name = "Code"><br>
     <input type="file" name="upload" multiple>
     <input type="submit" value="Upload">
 </form>

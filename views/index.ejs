@@ -1,5 +1,19 @@
 <html>
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+</head>
   <body>
     Hello World
+    <%= projects.length %>
+    <p></p>
+    <script>
+    jQuery(document).ready(function($){
+      <% for(var i = 0; i< projects.length; i++){%>
+        var name = "<%= projects[i]['Title'] %>";
+        $('p').append("<a href = '/download/"+ name +"'>" + name + "</a>");
+        $('p').append("</br>");
+      <%}%>
+    })
+    </script>
     </body>
 </html>

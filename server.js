@@ -9,7 +9,6 @@ var session = require('express-session');
 var passport = require('passport');
 var config = require('./config');
 var app = express();
-var download = require('download-pdf');
 var formidable = require('formidable');
 
 var users = {};
@@ -39,7 +38,7 @@ var registerPassport = function (client, params) {
 
 	app.get('/login', passport.authenticate('oidc',
 	  {
-		successRedirect: '/events',
+		successRedirect: '/home',
 		failureRedirect: '/',
 		failureFlash: true,
 	  }
@@ -47,7 +46,7 @@ var registerPassport = function (client, params) {
 
 	app.get('/callback', passport.authenticate('oidc',
 	  {
-		successRedirect: '/events',
+		successRedirect: '/home',
 		failureRedirect: '/',
 		failureFlash: true,
 	  }
@@ -104,38 +103,80 @@ app.use('/', express.static('./public'));
 
 //i18n
 
+
+var con = mysql.createConnection({
+	host: "localhost",
+	user: "rieintern",
+	password: "veryusefulintern",
+	database: "researchportal"
+});
+
+con.connect(function(err){
+	if (err) throw err;
+	console.log("connected");
+})
+
 //Routes
 //app.use('/', routes);
-// routes =====================================================================
+//routes======================================================================
 app.get('/', function(req, res){
 	if (req.user) {
-		res.redirect("/events");
+		res.redirect("/login");
 	} else {
   		res.render('index');
 	}
 });
 
-app.get('/events', ensureAuthenticated, function(req, res){
- console.log(req.user.name);
- res.render('index.ejs');
+app.get('/home', ensureAuthenticated, function(req, res){
+	con.query("SELECT * FROM projects", function(err, result, fields){
+			if(err) throw err;
+			console.log(result);
+			res.render('index.ejs', {projects: result});
+		});
 });
 
-app.get('/file', function(req, res){
+app.get('/file', ensureAuthenticated, function(req, res){
 	res.render('uploadFile.ejs');
 });
 
-app.post('/upload', function(req, res){
+app.post('/upload', ensureAuthenticated, function(req, res){
 	var form = new formidable.IncomingForm();
 	form.parse(req);
+	var data = [];
+	form.on('field', function(name, field){
+		data.push({name, field});
+		console.log(name);
+	});
 	form.on('fileBegin', function (name, file){
-        file.path = __dirname + '/uploads/' + file.name;
-    });
+      file.path = __dirname + '/uploads/' + data[5]['field'] +'.pdf';
+  });
+  form.on('file', function (name, file){
+      console.log('Uploaded ' + file.name);
+			console.log(data);
+  });
+	form.on('end', function(){
 
-    form.on('file', function (name, file){
-        console.log('Uploaded ' + file.name);
-    });
+		var datetime = new Date();
+		var sql = "INSERT INTO projects (noStudents, Student1, Student2, Student3, Student4, Title, Code, submittedBy, submittedDate) VALUES ?";
+		var values = [[
+			data[0]['field'],
+			data[1]['field'],
+			data[2]['field'],
+			data[3]['field'],
+			data[4]['field'],
+			data[5]['field'],
+			data[6]['field'],
+			req.user.name,
+			datetime
+		]];
+		console.log(values);
+		con.query(sql, [values], function(err, result){
+			if (err) throw err;
+			console.log("inserted!");
+		});
+	});
+  res.redirect('/home');
 
-    res.redirect('/events');
 });
 
 app.get('/logout', function(req, res){
@@ -147,9 +188,15 @@ app.get('/logout', function(req, res){
 	}
 });
 
+app.get('/download/:name', ensureAuthenticated, function(req, res){
+	res.download(__dirname + '/uploads/'+req.params.name+'.pdf');
+})
+
+
 app.get('/download', function(req, res){
 	res.download(__dirname + '/uploads/test.pdf');
 });
+
 
 // ==========================================================================
 
