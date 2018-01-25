@@ -123,7 +123,7 @@ app.get('/', function(req, res){
 	if (req.user) {
 		res.redirect("/login");
 	} else {
-  		res.render('index');
+		res.redirect('/home');
 	}
 });
 
@@ -131,11 +131,12 @@ app.get('/home', ensureAuthenticated, function(req, res){
 	con.query("SELECT * FROM projects", function(err, result, fields){
 			if(err) throw err;
 			console.log(result);
-			res.render('index.ejs', {projects: result});
+			var arr = ['Student1', 'Student2', 'Student3', 'Student4'];
+			res.render('index.ejs', {projects: result, arr});
 		});
 });
 
-app.get('/file', ensureAuthenticated, function(req, res){
+app.get('/submit', ensureAuthenticated, function(req, res){
 	res.render('uploadFile.ejs');
 });
 
@@ -148,7 +149,7 @@ app.post('/upload', ensureAuthenticated, function(req, res){
 		console.log(name);
 	});
 	form.on('fileBegin', function (name, file){
-      file.path = __dirname + '/uploads/' + data[5]['field'] +'.pdf';
+      file.path = __dirname + '/uploads/' + data[6]['field'] +'.pdf';
   });
   form.on('file', function (name, file){
       console.log('Uploaded ' + file.name);
@@ -192,6 +193,15 @@ app.get('/download/:name', ensureAuthenticated, function(req, res){
 	res.download(__dirname + '/uploads/'+req.params.name+'.pdf');
 })
 
+app.get('/project/:code', ensureAuthenticated, function(req, res){
+	var sql = "SELECT * FROM projects WHERE Code = '" + req.params.code + "'";
+	console.log(sql);
+	con.query(sql, function(err, result){
+		if(err) throw err;
+		console.log(result);
+		res.render('project.ejs', {project: result});
+	});
+})
 
 app.get('/download', function(req, res){
 	res.download(__dirname + '/uploads/test.pdf');

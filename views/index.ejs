@@ -1,18 +1,125 @@
 <html>
 <head>
+  <title>
+    Research Portal
+  </title>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <style>
+    body{
+      padding: 15px;
+    }
+    h1{
+      font-family: sans-serif;
+      font-size: 40px;
+      float: left;
+      margin: 0;
+    }
+    #projectList{
+      font-family: sans-serif;
+      width: 80%;
+      text-align: left;
+    }
+    th{
+      padding-right: 30px;
+    }
+    table{
+      border-collapse: collapse;
+    }
+    tr:not(:first-of-type){
+      border-top: solid;
+      border-width: thin;
+    }
+    tr:nth-child(2n){
+      background-color: aliceblue;
+    }
+    td, th{
+      padding-top: 10px;
+      padding-bottom: 15px;
+      vertical-align: text-top;
+    }
+    tr:not(:first-of-type):hover{
+      background-color: #cce6ff;
+    }
+    #filter{
+      width: 300px;
+      font-family: sans-serif;
+      font-size: 15px;
+      margin-bottom: 15px;
+    }
+    #top{
+      display: inline-block;
+      width: 100%;
+      position: relative;
+    }
+    .links{
+      float: right;
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      font-family: sans-serif;
+    }
+    a{
+      text-decoration: none;
+      color: black;
+    }
+    a:hover{
+      color: #009a90;
+    }
+    label{
+      font-family: sans-serif;
+      font-size: 20px;
+    }
+  </style>
 </head>
   <body>
-    Hello World
-    <%= projects.length %>
-    <p></p>
+    <div id = "top">
+      <h1>Research Portal</h1>
+      <span class = "links">
+        <a href = "/submit">Submit Project</a> |
+        <a href = "/home">Find Projects</a>
+      </span>
+    </div><br>
+    <hr>
+    <br>
+    <label for = "filter">Search: </label>
+    <input type = "text" id = "filter" onkeyup = "search()" placeholder = "Search by title/code/name">
+    <table align = "center" id = "projectList">
+      <tr>
+        <th>Project Code</th>
+        <th>Project Title</th>
+        <th>Project Members</th>
+      </tr>
+    </table>
     <script>
+    function search(){
+      $('.data').each(function(i, obj){
+        var match = false;
+        $(this).find('td').each(function(j, td){
+          if($(this).text().toUpperCase().indexOf($('#filter').val().toUpperCase()) > -1){
+            match = true;
+          }
+        });
+        if(match){
+          $(this).show();
+        }else{
+          $(this).hide();
+        }
+      });
+    }
+
     jQuery(document).ready(function($){
-      <% for(var i = 0; i< projects.length; i++){%>
+      <% for(var i = 0; i < projects.length; i++){%>
         var name = "<%= projects[i]['Title'] %>";
-        $('p').append("<a href = '/download/"+ name +"'>" + name + "</a>");
-        $('p').append("</br>");
+        var tr = "<tr class = 'data' data-href = '/project/<%= projects[i]['Code'] %>'><td><%= projects[i]['Code'] %></td><td><%= projects[i]['Title'] %></td><td>";
+        <%for (var j = 0; j < parseInt(projects[i]['noStudents']); j++){%>
+          tr += "<%= projects[i][arr[j]] %></br>";
+        <%}%>
+        tr += ("</td></tr>");
+        $("#projectList").append(tr);
       <%}%>
+      $(".data").click(function(){
+        window.location.replace($(this).data("href"));
+      });
     })
     </script>
     </body>
