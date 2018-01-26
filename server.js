@@ -168,7 +168,7 @@ app.post('/upload', ensureAuthenticated, function(req, res){
 			data[5]['field'],
 			data[6]['field'],
 			req.user.name,
-			datetime
+			moment().format('MMM Do YYYY, h:mm:ss a')
 		]];
 		console.log(values);
 		con.query(sql, [values], function(err, result){
@@ -199,7 +199,8 @@ app.get('/project/:code', ensureAuthenticated, function(req, res){
 	con.query(sql, function(err, result){
 		if(err) throw err;
 		console.log(result);
-		res.render('project.ejs', {project: result});
+		var arr = ['Student1', 'Student2', 'Student3', 'Student4'];
+		res.render('project.ejs', {project: result, arr});
 	});
 })
 
