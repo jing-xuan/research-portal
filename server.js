@@ -90,7 +90,7 @@ app.use(cookieParser());
 
 //Session setup
 app.use(session({
-	secret:'keyboard cat', resave: true, saveUninitialized: false
+	secret: /*secret*/, resave: true, saveUninitialized: false
 }));
 
 app.use(bodyParser.urlencoded({extended: true}));
@@ -105,10 +105,7 @@ app.use('/', express.static('./public'));
 
 
 var con = mysql.createConnection({
-	host: "localhost",
-	user: "rieintern",
-	password: "veryusefulintern",
-	database: "researchportal"
+	//your stuff here
 });
 
 con.connect(function(err){
